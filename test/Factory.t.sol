@@ -5,6 +5,7 @@ import {Test, console, Vm} from 'forge-std/src/Test.sol';
 import {IERC20, ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {Factory} from 'contracts/Factory.sol';
 import {DiamoreToken} from 'contracts/DiamoreToken.sol';
+import {DiamoreETHToken} from 'contracts/DiamoreETHToken.sol';
 import {IAccessControl} from '@openzeppelin/contracts/access/IAccessControl.sol';
 
 contract AdapterTest is Test {
@@ -62,7 +63,6 @@ contract AdapterTest is Test {
     function test_token() public {
         vm.startPrank(admin);
         DiamoreToken dmrDai = DiamoreToken(factory.createToken(address(dai)));
-        console.log(address(dmrDai));
         assertEq(dmrDai.decimals(), dai.decimals());
         assertEq(string(abi.encodePacked(_prefixName, dai.name())), dmrDai.name());
         assertEq(string(abi.encodePacked(_prefixSymbol, dai.symbol())), dmrDai.symbol());
@@ -81,6 +81,29 @@ contract AdapterTest is Test {
         dmrDai.reverseExchange(10e18);
         assertEq(dmrDai.balanceOf(user), 90e18);
         assertEq(dai.balanceOf(address(dmrDai)), 90e18);
+        vm.stopPrank();
+    }
+
+    function test_EthToken() public {
+        vm.startPrank(admin);
+        DiamoreETHToken dmrETH = DiamoreETHToken(factory.createNativeToken());
+        assertEq(dmrETH.decimals(), 18);
+        assertEq(string('Diamore: ETH'), dmrETH.name());
+        assertEq(string('dmrETH'), dmrETH.symbol());
+        assertEq(dmrETH.totalSupply(), 0);
+        assertEq(dmrETH.originalToken(), factory.NATIVE());
+
+        vm.stopPrank();
+
+        vm.startPrank(user);
+        uint256 amount = 100e18;
+        dmrETH.exchange{value: amount}();
+        assertEq(dmrETH.balanceOf(user), amount);
+        assertEq(address(dmrETH).balance, amount);
+
+        dmrETH.reverseExchange(10e18);
+        assertEq(dmrETH.balanceOf(user), 90e18);
+        assertEq(address(dmrETH).balance, 90e18);
         vm.stopPrank();
     }
 }

@@ -3,13 +3,11 @@
 ## Short description
 
 
-
 - - -
 
 ## Technologies
 
  - Solidity
- - Typescript
  - Foundry
 
  - - -

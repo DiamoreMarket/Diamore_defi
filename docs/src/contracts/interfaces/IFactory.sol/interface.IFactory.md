@@ -1,5 +1,5 @@
 # IFactory
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/master/contracts/interfaces/IFactory.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/edd6ba9db54e37902a75d85bd6f76310c4976943/contracts/interfaces/IFactory.sol)
 
 
 ## Functions
@@ -8,6 +8,13 @@
 
 ```solidity
 function createToken(address token) external returns (address newToken);
+```
+
+### createNativeToken
+
+
+```solidity
+function createNativeToken() external returns (address newToken);
 ```
 
 ### getTokenList

@@ -2,11 +2,13 @@
 pragma solidity ^0.8.20;
 import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
 import {IERC20Metadata} from '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import {DiamoreToken} from './DiamoreToken.sol';
 import {IFactory} from './interfaces/IFactory.sol';
+import {DiamoreToken} from './DiamoreToken.sol';
+import {DiamoreETHToken} from './DiamoreETHToken.sol';
 
 contract Factory is IFactory, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256('ADMIN_ROLE');
+    address public constant NATIVE = 0x0000000000000000000000000000000000001010;
 
     /// `tokenList` is an array that stores the addresses of all the Diamore tokens created by the factory.
     address[] public tokenList;
@@ -36,6 +38,28 @@ contract Factory is IFactory, AccessControl {
         newToken = _deploy(0, bytes32(_salt), bytecode);
         tokenList.push(newToken);
         _salt++;
+
+        emit TokenCreated(token, newToken);
+    }
+
+    /// @dev This function creates a new DiamoreETHToken contract.
+    /// The DiamoreETHToken is a specialized DiamoreToken that is backed by Ether (ETH).
+    /// Since ETH is a native asset on the Ethereum blockchain, the DiamoreETHToken is
+    /// created with a constant address (`NATIVE`) instead of an ERC20 token.
+    /// The DiamoreETHToken is deployed with a similar process as the DiamoreToken, but with
+    /// the `name` and `symbol` set to "Diamore: ETH" and "dmrETH" respectively, and the
+    /// `decimals` set to 18.
+    function createNativeToken() external override onlyRole(ADMIN_ROLE) returns (address newToken) {
+        address token = NATIVE;
+        string memory name = 'ETH';
+        string memory symbol = 'ETH';
+        uint8 decimal = 18;
+        (name, symbol) = _addPrefix(name, symbol);
+        bytes memory bytecode = _getBytecodeETH(name, symbol, decimal, token);
+        newToken = _deploy(0, bytes32(_salt), bytecode);
+        tokenList.push(newToken);
+        _salt++;
+
         emit TokenCreated(token, newToken);
     }
 
@@ -121,6 +145,17 @@ contract Factory is IFactory, AccessControl {
         address token
     ) internal pure returns (bytes memory) {
         bytes memory bytecode = type(DiamoreToken).creationCode;
+
+        return abi.encodePacked(bytecode, abi.encode(name, symbol, decimals, token));
+    }
+
+    function _getBytecodeETH(
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        address token
+    ) internal pure returns (bytes memory) {
+        bytes memory bytecode = type(DiamoreETHToken).creationCode;
 
         return abi.encodePacked(bytecode, abi.encode(name, symbol, decimals, token));
     }

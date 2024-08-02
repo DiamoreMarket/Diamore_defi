@@ -1,5 +1,5 @@
 # Factory
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/master/contracts/Factory.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/edd6ba9db54e37902a75d85bd6f76310c4976943/contracts/Factory.sol)
 
 **Inherits:**
 [IFactory](/contracts/interfaces/IFactory.sol/interface.IFactory.md), AccessControl
@@ -10,6 +10,13 @@
 
 ```solidity
 bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+```
+
+
+### NATIVE
+
+```solidity
+address public constant NATIVE = 0x0000000000000000000000000000000000001010;
 ```
 
 
@@ -75,6 +82,21 @@ function createToken(address token) external override onlyRole(ADMIN_ROLE) retur
 |----|----|-----------|
 |`newToken`|`address`|The address of the newly created DiamoreToken contract.|
 
+
+### createNativeToken
+
+*This function creates a new DiamoreETHToken contract.
+The DiamoreETHToken is a specialized DiamoreToken that is backed by Ether (ETH).
+Since ETH is a native asset on the Ethereum blockchain, the DiamoreETHToken is
+created with a constant address (`NATIVE`) instead of an ERC20 token.
+The DiamoreETHToken is deployed with a similar process as the DiamoreToken, but with
+the `name` and `symbol` set to "Diamore: ETH" and "dmrETH" respectively, and the
+`decimals` set to 18.*
+
+
+```solidity
+function createNativeToken() external override onlyRole(ADMIN_ROLE) returns (address newToken);
+```
 
 ### getTokenList
 
@@ -222,6 +244,16 @@ function _getBytecode(string memory name, string memory symbol, uint8 decimals, 
 |----|----|-----------|
 |`<none>`|`bytes`|bytecode The bytecode of the DiamoreToken contract with the provided parameters.|
 
+
+### _getBytecodeETH
+
+
+```solidity
+function _getBytecodeETH(string memory name, string memory symbol, uint8 decimals, address token)
+    internal
+    pure
+    returns (bytes memory);
+```
 
 ### _computeAddress
 

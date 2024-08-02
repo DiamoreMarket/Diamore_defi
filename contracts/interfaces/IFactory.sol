@@ -21,6 +21,8 @@ interface IFactory {
 
     function createToken(address token) external returns (address newToken);
 
+    function createNativeToken() external returns (address newToken);
+
     function getTokenList() external view returns (address[] memory);
 
     function getContractAddress(address token) external view returns (address);
