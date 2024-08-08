@@ -1,5 +1,5 @@
 {
-  "name": "Diamore_smart_contract",
+  "name": "Diamore_smart_contracts",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,9 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts-upgradeable": "^5.0.2",
-    "@uniswap/v3-core": "github:Uniswap/v3-core#0.8",
-    "@uniswap/v3-periphery": "github:Uniswap/v3-periphery",
+    "@openzeppelin/contracts": "^5.0.2",
     "forge-std": "github:foundry-rs/forge-std"
   },
   "devDependencies": {
