@@ -6,13 +6,11 @@ import {Factory} from 'contracts/Factory.sol';
 
 contract FactoryDeploy is Script {
     function run() external {
-        string memory _prefixName = 'Diamore: ';
-        string memory _prefixSymbol = 'dmr';
         uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
         console.log('Deployer private key: ', deployerPrivateKey);
         vm.startBroadcast(deployerPrivateKey);
 
-        Factory factory = new Factory(_prefixName, _prefixSymbol);
+        Factory factory = new Factory();
         console.log('Factory address: ', address(factory));
         vm.stopBroadcast();
     }

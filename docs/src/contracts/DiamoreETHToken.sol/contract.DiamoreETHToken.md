@@ -1,5 +1,5 @@
 # DiamoreETHToken
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/edd6ba9db54e37902a75d85bd6f76310c4976943/contracts/DiamoreETHToken.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/1a7495662ef29cdbb3e771f245da1f2d67f4e41e/contracts/DiamoreETHToken.sol)
 
 **Inherits:**
 [IDiamoreETHToken](/contracts/interfaces/IDiamoreETHToken.sol/interface.IDiamoreETHToken.md), ERC165, ERC20, ReentrancyGuard

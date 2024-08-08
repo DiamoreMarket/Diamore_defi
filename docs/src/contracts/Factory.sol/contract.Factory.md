@@ -1,5 +1,5 @@
 # Factory
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/edd6ba9db54e37902a75d85bd6f76310c4976943/contracts/Factory.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/1a7495662ef29cdbb3e771f245da1f2d67f4e41e/contracts/Factory.sol)
 
 **Inherits:**
 [IFactory](/contracts/interfaces/IFactory.sol/interface.IFactory.md), AccessControl
@@ -29,22 +29,6 @@ address[] public tokenList;
 ```
 
 
-### _prefixName
-`_prefixName` and `_prefixSymbol` are strings that will be prepended to the name and symbol of the Diamore tokens.
-
-
-```solidity
-string internal _prefixName;
-```
-
-
-### _prefixSymbol
-
-```solidity
-string internal _prefixSymbol;
-```
-
-
 ### _salt
 `_salt` is a uint256 that will be used as a salt for the CREATE2 deployment of the Diamore tokens.
 
@@ -59,7 +43,7 @@ uint256 internal _salt;
 
 
 ```solidity
-constructor(string memory prefixName, string memory prefixSymbol);
+constructor();
 ```
 
 ### createToken
@@ -68,13 +52,19 @@ constructor(string memory prefixName, string memory prefixSymbol);
 
 
 ```solidity
-function createToken(address token) external override onlyRole(ADMIN_ROLE) returns (address newToken);
+function createToken(address token, string memory name, string memory symbol)
+    external
+    override
+    onlyRole(ADMIN_ROLE)
+    returns (address newToken);
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
 |`token`|`address`|The address of the original token.|
+|`name`|`string`||
+|`symbol`|`string`||
 
 **Returns**
 
@@ -88,14 +78,15 @@ function createToken(address token) external override onlyRole(ADMIN_ROLE) retur
 *This function creates a new DiamoreETHToken contract.
 The DiamoreETHToken is a specialized DiamoreToken that is backed by Ether (ETH).
 Since ETH is a native asset on the Ethereum blockchain, the DiamoreETHToken is
-created with a constant address (`NATIVE`) instead of an ERC20 token.
-The DiamoreETHToken is deployed with a similar process as the DiamoreToken, but with
-the `name` and `symbol` set to "Diamore: ETH" and "dmrETH" respectively, and the
-`decimals` set to 18.*
+created with a constant address (`NATIVE`) instead of an ERC20 token.*
 
 
 ```solidity
-function createNativeToken() external override onlyRole(ADMIN_ROLE) returns (address newToken);
+function createNativeToken(string memory name, string memory symbol)
+    external
+    override
+    onlyRole(ADMIN_ROLE)
+    returns (address newToken);
 ```
 
 ### getTokenList
@@ -119,13 +110,19 @@ function getTokenList() external view override returns (address[] memory);
 
 
 ```solidity
-function getContractAddress(address token) external view override returns (address);
+function getContractAddress(address token, string memory name, string memory symbol)
+    external
+    view
+    override
+    returns (address);
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
 |`token`|`address`|The address of the original token.|
+|`name`|`string`||
+|`symbol`|`string`||
 
 **Returns**
 
@@ -192,30 +189,6 @@ function _deploy(uint256 amount, bytes32 salt, bytes memory bytecode) internal r
 |Name|Type|Description|
 |----|----|-----------|
 |`addr`|`address`|The address of the deployed contract.|
-
-
-### _addPrefix
-
-*This internal function takes in a name and a symbol,
-and prepends them with the factory's `_prefixName` and `_prefixSymbol` respectively.*
-
-
-```solidity
-function _addPrefix(string memory name, string memory symbol) internal view returns (string memory, string memory);
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`name`|`string`|The name of the token.|
-|`symbol`|`string`|The symbol of the token.|
-
-**Returns**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`<none>`|`string`|The modified name and symbol with the factory's prefixes applied.|
-|`<none>`|`string`||
 
 
 ### _getBytecode

@@ -13,17 +13,11 @@ contract Factory is IFactory, AccessControl {
     /// `tokenList` is an array that stores the addresses of all the Diamore tokens created by the factory.
     address[] public tokenList;
 
-    /// `_prefixName` and `_prefixSymbol` are strings that will be prepended to the name and symbol of the Diamore tokens.
-    string internal _prefixName;
-    string internal _prefixSymbol;
-
     /// `_salt` is a uint256 that will be used as a salt for the CREATE2 deployment of the Diamore tokens.
     uint256 internal _salt;
 
-    constructor(string memory prefixName, string memory prefixSymbol) {
+    constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _prefixName = prefixName;
-        _prefixSymbol = prefixSymbol;
     }
 
     /**
@@ -31,9 +25,12 @@ contract Factory is IFactory, AccessControl {
      * @param token The address of the original token.
      * @return newToken The address of the newly created DiamoreToken contract.
      */
-    function createToken(address token) external override onlyRole(ADMIN_ROLE) returns (address newToken) {
-        (string memory name, string memory symbol, uint8 decimal) = getMetadata(token);
-        (name, symbol) = _addPrefix(name, symbol);
+    function createToken(
+        address token,
+        string memory name,
+        string memory symbol
+    ) external override onlyRole(ADMIN_ROLE) returns (address newToken) {
+        uint8 decimal = IERC20Metadata(token).decimals();
         bytes memory bytecode = _getBytecode(name, symbol, decimal, token);
         newToken = _deploy(0, bytes32(_salt), bytecode);
         tokenList.push(newToken);
@@ -46,15 +43,12 @@ contract Factory is IFactory, AccessControl {
     /// The DiamoreETHToken is a specialized DiamoreToken that is backed by Ether (ETH).
     /// Since ETH is a native asset on the Ethereum blockchain, the DiamoreETHToken is
     /// created with a constant address (`NATIVE`) instead of an ERC20 token.
-    /// The DiamoreETHToken is deployed with a similar process as the DiamoreToken, but with
-    /// the `name` and `symbol` set to "Diamore: ETH" and "dmrETH" respectively, and the
-    /// `decimals` set to 18.
-    function createNativeToken() external override onlyRole(ADMIN_ROLE) returns (address newToken) {
+    function createNativeToken(
+        string memory name,
+        string memory symbol
+    ) external override onlyRole(ADMIN_ROLE) returns (address newToken) {
         address token = NATIVE;
-        string memory name = 'ETH';
-        string memory symbol = 'ETH';
         uint8 decimal = 18;
-        (name, symbol) = _addPrefix(name, symbol);
         bytes memory bytecode = _getBytecodeETH(name, symbol, decimal, token);
         newToken = _deploy(0, bytes32(_salt), bytecode);
         tokenList.push(newToken);
@@ -72,9 +66,12 @@ contract Factory is IFactory, AccessControl {
     /// @dev This function computes the address of a Diamore token based on its metadata and the factory's address.
     /// @param token The address of the original token.
     /// @return contractAddress The address of the DiamoreToken contract.
-    function getContractAddress(address token) external view override returns (address) {
-        (string memory name, string memory symbol, uint8 decimal) = getMetadata(token);
-        (name, symbol) = _addPrefix(name, symbol);
+    function getContractAddress(
+        address token,
+        string memory name,
+        string memory symbol
+    ) external view override returns (address) {
+        (, , uint8 decimal) = getMetadata(token);
 
         bytes memory bytecode = _getBytecode(name, symbol, decimal, token);
 
@@ -121,15 +118,6 @@ contract Factory is IFactory, AccessControl {
         if (addr == address(0)) {
             revert Create2FailedDeployment();
         }
-    }
-
-    /// @dev This internal function takes in a name and a symbol,
-    /// and prepends them with the factory's `_prefixName` and `_prefixSymbol` respectively.
-    /// @param name The name of the token.
-    /// @param symbol The symbol of the token.
-    /// @return The modified name and symbol with the factory's prefixes applied.
-    function _addPrefix(string memory name, string memory symbol) internal view returns (string memory, string memory) {
-        return (string(abi.encodePacked(_prefixName, name)), string(abi.encodePacked(_prefixSymbol, symbol)));
     }
 
     /// @dev This internal function generates the bytecode for a DiamoreToken contract.

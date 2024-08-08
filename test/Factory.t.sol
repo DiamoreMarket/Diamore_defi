@@ -8,7 +8,7 @@ import {DiamoreToken} from 'contracts/DiamoreToken.sol';
 import {DiamoreETHToken} from 'contracts/DiamoreETHToken.sol';
 import {IAccessControl} from '@openzeppelin/contracts/access/IAccessControl.sol';
 
-contract AdapterTest is Test {
+contract FactoryTest is Test {
     ERC20 constant usdt = ERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
     ERC20 constant dai = ERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
@@ -16,9 +16,6 @@ contract AdapterTest is Test {
     address user2 = makeAddr('user2');
     address admin = makeAddr('admin');
     address deployer = makeAddr('deployer');
-
-    string internal _prefixName = 'Diamore: ';
-    string internal _prefixSymbol = 'dmr';
 
     Factory factory;
 
@@ -28,7 +25,7 @@ contract AdapterTest is Test {
 
         vm.startPrank(deployer);
 
-        factory = new Factory(_prefixName, _prefixSymbol);
+        factory = new Factory();
         uint256 amount = 100e18;
         deal(user, amount);
         deal(address(usdt), user, amount);
@@ -46,14 +43,14 @@ contract AdapterTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, user, factory.ADMIN_ROLE())
         );
-        factory.createToken(address(usdt));
+        factory.createToken(address(usdt), 'name', 'symbol');
         vm.stopPrank();
 
         vm.startPrank(admin);
-        address dmrUsdt = factory.getContractAddress(address(usdt));
-        factory.createToken(address(usdt));
-        address dmrDai = factory.getContractAddress(address(dai));
-        factory.createToken(address(dai));
+        address dmrUsdt = factory.getContractAddress(address(usdt), 'Diamore: ', 'dmr');
+        factory.createToken(address(usdt), 'Diamore: ', 'dmr');
+        address dmrDai = factory.getContractAddress(address(dai), 'Diamore: ', 'dmr');
+        factory.createToken(address(dai), 'Diamore: ', 'dmr');
         address[] memory list = factory.getTokenList();
         assertEq(list[0], dmrUsdt);
         assertEq(list[1], dmrDai);
@@ -62,10 +59,10 @@ contract AdapterTest is Test {
 
     function test_token() public {
         vm.startPrank(admin);
-        DiamoreToken dmrDai = DiamoreToken(factory.createToken(address(dai)));
+        DiamoreToken dmrDai = DiamoreToken(factory.createToken(address(dai), 'Diamore: Dai Stablecoin', 'dmrDAI'));
         assertEq(dmrDai.decimals(), dai.decimals());
-        assertEq(string(abi.encodePacked(_prefixName, dai.name())), dmrDai.name());
-        assertEq(string(abi.encodePacked(_prefixSymbol, dai.symbol())), dmrDai.symbol());
+        assertEq('Diamore: Dai Stablecoin', dmrDai.name());
+        assertEq('dmrDAI', dmrDai.symbol());
         assertEq(dmrDai.totalSupply(), 0);
         assertEq(dmrDai.originalToken(), address(dai));
 
@@ -86,7 +83,7 @@ contract AdapterTest is Test {
 
     function test_EthToken() public {
         vm.startPrank(admin);
-        DiamoreETHToken dmrETH = DiamoreETHToken(factory.createNativeToken());
+        DiamoreETHToken dmrETH = DiamoreETHToken(factory.createNativeToken('Diamore: ETH', 'dmrETH'));
         assertEq(dmrETH.decimals(), 18);
         assertEq(string('Diamore: ETH'), dmrETH.name());
         assertEq(string('dmrETH'), dmrETH.symbol());

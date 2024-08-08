@@ -19,13 +19,17 @@ interface IFactory {
      */
     error Create2FailedDeployment();
 
-    function createToken(address token) external returns (address newToken);
+    function createToken(address token, string memory name, string memory symbol) external returns (address newToken);
 
-    function createNativeToken() external returns (address newToken);
+    function createNativeToken(string memory name, string memory symbol) external returns (address newToken);
 
     function getTokenList() external view returns (address[] memory);
 
-    function getContractAddress(address token) external view returns (address);
+    function getContractAddress(
+        address token,
+        string memory name,
+        string memory symbol
+    ) external view returns (address);
 
     function getMetadata(
         address token
