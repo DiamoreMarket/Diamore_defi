@@ -29,7 +29,7 @@ contract DiamoreToken is ERC165, IDiamoreToken, ERC20 {
     /// @dev This function transfers the specified amount of tokens from the caller's account to the DiamoreToken contract.
     /// If the specified amount is zero, the function will revert with the message 'Zero amount'.
     /// @param amount The amount of tokens to be exchanged.
-    function exchange(uint256 amount) external override {
+    function deposit(uint256 amount) external override {
         if (amount == 0) revert('Zero amount');
         IERC20(originalToken).safeTransferFrom(msg.sender, address(this), amount);
         _mint(msg.sender, amount);
@@ -42,7 +42,7 @@ contract DiamoreToken is ERC165, IDiamoreToken, ERC20 {
     /// and transfers the specified amount of original tokens to the caller's account.
     /// If the specified amount is zero, the function will revert with the message 'Zero amount'.
     /// @param amount The amount of diamore tokens to be reversed.
-    function reverseExchange(uint256 amount) external override {
+    function withdraw(uint256 amount) external override {
         _burn(msg.sender, amount);
 
         IERC20(originalToken).safeTransfer(msg.sender, amount);

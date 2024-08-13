@@ -1,5 +1,5 @@
 # IFactory
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/1a7495662ef29cdbb3e771f245da1f2d67f4e41e/contracts/interfaces/IFactory.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/d9c233f3d22bc21895cd7ba877d73ff5b80f578a/contracts/interfaces/IFactory.sol)
 
 
 ## Functions

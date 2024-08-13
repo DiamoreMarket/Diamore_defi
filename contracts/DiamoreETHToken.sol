@@ -30,7 +30,7 @@ contract DiamoreETHToken is IDiamoreETHToken, ERC165, ERC20, ReentrancyGuard {
 
     /// @notice This function allows users to exchange their original tokens for their diamore tokens.
     /// @dev This function accepts ETH as payment and transfers the specified amount of diamore tokens to the caller's account.
-    function exchange() external payable {
+    function deposit() external payable {
         uint256 amount = msg.value;
         if (amount == 0) revert('Zero amount');
         _mint(msg.sender, amount);
@@ -43,7 +43,7 @@ contract DiamoreETHToken is IDiamoreETHToken, ERC165, ERC20, ReentrancyGuard {
     /// and transfers the specified amount of original tokens to the caller's account.
     /// If the specified amount is zero, the function will revert with the message 'Zero amount'.
     /// @param amount The amount of diamore tokens to be reversed.
-    function reverseExchange(uint256 amount) external override nonReentrant {
+    function withdraw(uint256 amount) external override nonReentrant {
         _burn(msg.sender, amount);
         Address.sendValue(payable(msg.sender), amount);
 

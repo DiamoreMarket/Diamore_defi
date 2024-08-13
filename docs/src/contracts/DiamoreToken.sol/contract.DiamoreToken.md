@@ -1,5 +1,5 @@
 # DiamoreToken
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/1a7495662ef29cdbb3e771f245da1f2d67f4e41e/contracts/DiamoreToken.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/d9c233f3d22bc21895cd7ba877d73ff5b80f578a/contracts/DiamoreToken.sol)
 
 **Inherits:**
 ERC165, [IDiamoreToken](/contracts/interfaces/IDiamoreToken.sol/interface.IDiamoreToken.md), ERC20
@@ -46,7 +46,7 @@ constructor(string memory name, string memory symbol, uint8 dec, address origTok
 |`origToken`|`address`|The original token address.|
 
 
-### exchange
+### deposit
 
 This function allows users to exchange their tokens for diamore tokens.
 
@@ -55,7 +55,7 @@ If the specified amount is zero, the function will revert with the message 'Zero
 
 
 ```solidity
-function exchange(uint256 amount) external override;
+function deposit(uint256 amount) external override;
 ```
 **Parameters**
 
@@ -64,7 +64,7 @@ function exchange(uint256 amount) external override;
 |`amount`|`uint256`|The amount of tokens to be exchanged.|
 
 
-### reverseExchange
+### withdraw
 
 This function allows users to reverse exchange their diamore tokens for their original tokens.
 
@@ -74,7 +74,7 @@ If the specified amount is zero, the function will revert with the message 'Zero
 
 
 ```solidity
-function reverseExchange(uint256 amount) external override;
+function withdraw(uint256 amount) external override;
 ```
 **Parameters**
 

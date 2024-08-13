@@ -71,11 +71,11 @@ contract FactoryTest is Test {
         vm.startPrank(user);
         uint256 amount = 100e18;
         dai.approve(address(dmrDai), amount);
-        dmrDai.exchange(amount);
+        dmrDai.deposit(amount);
         assertEq(dmrDai.balanceOf(user), amount);
         assertEq(dai.balanceOf(address(dmrDai)), amount);
 
-        dmrDai.reverseExchange(10e18);
+        dmrDai.withdraw(10e18);
         assertEq(dmrDai.balanceOf(user), 90e18);
         assertEq(dai.balanceOf(address(dmrDai)), 90e18);
         vm.stopPrank();
@@ -94,11 +94,11 @@ contract FactoryTest is Test {
 
         vm.startPrank(user);
         uint256 amount = 100e18;
-        dmrETH.exchange{value: amount}();
+        dmrETH.deposit{value: amount}();
         assertEq(dmrETH.balanceOf(user), amount);
         assertEq(address(dmrETH).balance, amount);
 
-        dmrETH.reverseExchange(10e18);
+        dmrETH.withdraw(10e18);
         assertEq(dmrETH.balanceOf(user), 90e18);
         assertEq(address(dmrETH).balance, 90e18);
         vm.stopPrank();

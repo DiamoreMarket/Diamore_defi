@@ -1,20 +1,20 @@
 # IDiamoreETHToken
-[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/1a7495662ef29cdbb3e771f245da1f2d67f4e41e/contracts/interfaces/IDiamoreETHToken.sol)
+[Git Source](https://github.com/DiamoreMarket/smart_contracts_sol/blob/d9c233f3d22bc21895cd7ba877d73ff5b80f578a/contracts/interfaces/IDiamoreETHToken.sol)
 
 
 ## Functions
-### exchange
+### deposit
 
 
 ```solidity
-function exchange() external payable;
+function deposit() external payable;
 ```
 
-### reverseExchange
+### withdraw
 
 
 ```solidity
-function reverseExchange(uint256 amount) external;
+function withdraw(uint256 amount) external;
 ```
 
 ## Events
