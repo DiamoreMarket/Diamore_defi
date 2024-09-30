@@ -5,7 +5,6 @@ interface IStakingNFT {
     struct NFTInfo {
         address owner;
         uint256 timeUnlock;
-        uint256 rewardReceived;
     }
     struct Message {
         uint256 tokenId;
@@ -24,8 +23,6 @@ interface IStakingNFT {
         OneYear
     }
 
-    event Withdraw(address owner, uint256 tokenId);
-    event Refund(address owner, uint256 tokenId);
     event Claimed(address owner, uint256 tokenId, uint256 amount);
     event Unstaked(address owner, uint256 tokenId);
     event Staked(address owner, uint256 tokenId);
@@ -35,15 +32,11 @@ interface IStakingNFT {
     error InvalidSignature();
     error NotReadyToUnstake(uint256 timeUnlock);
 
-    function withdraw(uint256 tokenId, address to) external;
-
     function setTreasure(address newTreasure) external;
-
-    function refund(uint256 tokenId) external;
 
     function stake(uint256 tokenId, LockPeriod lock) external;
 
-    function unstake(Vrs calldata vrs, Message calldata message) external;
+    function unstake(uint256 tokenId) external;
 
     function claim(Vrs calldata vrs, Message calldata message) external;
 
