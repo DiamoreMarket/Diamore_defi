@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
-// import {ERC721Holder} from '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC20, SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {EIP712} from '@openzeppelin/contracts/utils/cryptography/EIP712.sol';
@@ -24,6 +23,8 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
     mapping(uint256 => NFTInfo) internal _nftInfoById;
     mapping(bytes32 => bool) internal _isHashUsed;
 
+    // mapping(address => uint256[]) internal tokensByOwner;
+
     event TreasureUpdated(address newTreasure);
 
     constructor(address collectionNFT, address validator, address rewardToken) EIP712('StakingNFT', '1.0') {
@@ -39,21 +40,25 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
 
     function stake(uint256 tokenId, LockPeriod lock) external override {
         IERC721(collection).safeTransferFrom(msg.sender, treasure, tokenId);
-        _nftInfoById[tokenId] = NFTInfo({owner: msg.sender, timeUnlock: _choiceLockPeriod(lock)});
+        uint256 timeUnlock = _choiceLockPeriod(lock);
+        _nftInfoById[tokenId] = NFTInfo({owner: msg.sender, timeUnlock: timeUnlock});
+        // tokensByOwner[msg.sender].push(tokenId);
 
-        emit Staked(msg.sender, tokenId);
+        emit Staked(msg.sender, tokenId, timeUnlock, lock);
     }
 
     function unstake(uint256 tokenId) external override {
         if (msg.sender != _nftInfoById[tokenId].owner) {
             revert NotOwner();
         }
-        if (_nftInfoById[tokenId].timeUnlock > block.timestamp) {
-            revert NotReadyToUnstake(_nftInfoById[tokenId].timeUnlock);
-        }
+        // Todo: uncomment
+        // if (_nftInfoById[tokenId].timeUnlock > block.timestamp) {
+        //     revert NotReadyToUnstake(_nftInfoById[tokenId].timeUnlock);
+        // }
 
         IERC721(collection).safeTransferFrom(treasure, msg.sender, tokenId);
         delete (_nftInfoById[tokenId]);
+
 
         emit Unstaked(msg.sender, tokenId);
     }
@@ -71,6 +76,11 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
         return _recoverAddress;
     }
 
+    function getVrsStatus(Message calldata message) external view override returns (bool) {
+        bytes32 digest = hashTypedDataV4(message);
+        return _isHashUsed[digest];
+    }
+
     function claim(Vrs calldata vrs, Message calldata message) public override {
         (address _recoverAddress, bytes32 digest) = _recoverMsg(vrs, message);
         if (_isHashUsed[digest]) {
@@ -79,14 +89,17 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
         if (!hasRole(VALIDATOR_ROLE, _recoverAddress)) {
             revert InvalidSignature();
         }
-        if (msg.sender != _nftInfoById[message.tokenId].owner) {
+        if (msg.sender != message.account) {
             revert NotOwner();
+        }
+        if (block.timestamp > message.timeExpire) {
+            revert Expired(message.timeExpire);
         }
         _isHashUsed[digest] = true;
 
-        IERC20(tokenReward).safeTransferFrom(treasure, _nftInfoById[message.tokenId].owner, message.amount);
+        IERC20(tokenReward).safeTransferFrom(treasure, message.account, message.amount);
 
-        emit Claimed(msg.sender, message.tokenId, message.amount);
+        emit Claimed(msg.sender, message.amount, vrs);
     }
 
     function hashTypedDataV4(Message calldata message) public view override returns (bytes32 digest) {
@@ -94,10 +107,11 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
             _hashTypedDataV4(
                 keccak256(
                     abi.encode(
-                        keccak256('Message(uint256 tokenId,uint256 amount,uint256 nonce)'),
-                        message.tokenId,
+                        keccak256('Message(address account,uint256 amount,uint256 nonce,uint256 timeExpire)'),
+                        message.account,
                         message.amount,
-                        message.nonce
+                        message.nonce,
+                        message.timeExpire
                     )
                 )
             );

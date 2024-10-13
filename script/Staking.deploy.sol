@@ -10,7 +10,7 @@ contract StakingNFTDeploy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         address collection = 0xd5ce3bCd228F9f098898DDcc9cbcc57657cdB2Dc;
-        address validator = msg.sender;
+        address validator = 0xf514358dE9C397D164196403d59C78E7402aec0F;
         address token = 0x20516d48337377268b4e6b885b5d6cb39eee65c9;
         StakingNFT staking = new StakingNFT(collection, validator, token);
         console.log('StakingNFT address: ', address(staking));

@@ -7,9 +7,10 @@ interface IStakingNFT {
         uint256 timeUnlock;
     }
     struct Message {
-        uint256 tokenId;
+        address account;
         uint256 amount;
         uint256 nonce;
+        uint256 timeExpire;
     }
     struct Vrs {
         uint8 v;
@@ -23,14 +24,15 @@ interface IStakingNFT {
         OneYear
     }
 
-    event Claimed(address owner, uint256 tokenId, uint256 amount);
+    event Claimed(address owner, uint256 amount, Vrs vrs);
     event Unstaked(address owner, uint256 tokenId);
-    event Staked(address owner, uint256 tokenId);
+    event Staked(address owner, uint256 tokenId, uint256 timeUnlock, LockPeriod lock);
 
     error NotOwner();
     error HashUsed();
     error InvalidSignature();
     error NotReadyToUnstake(uint256 timeUnlock);
+    error Expired(uint256 timeExpire);
 
     function setTreasure(address newTreasure) external;
 
@@ -45,4 +47,6 @@ interface IStakingNFT {
     function recoverSign(Vrs calldata vrs, Message calldata message) external view returns (address _recoverAddress);
 
     function hashTypedDataV4(Message calldata message) external view returns (bytes32 digest);
+
+    function getVrsStatus(Message calldata message) external view returns (bool);
 }
