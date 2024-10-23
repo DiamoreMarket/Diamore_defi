@@ -1,7 +1,7 @@
 import {Test, console, Vm} from 'forge-std/src/Test.sol';
 import {VmSafe} from 'node_modules/forge-std/src/Vm.sol';
 import {IERC20, SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import {NFTify721} from 'contracts/nft/NFTify721.sol';
+import {NFTify721} from 'contracts/mock/nft/NFTify721.sol';
 import {StakingNFT, IStakingNFT} from 'contracts/staking/StakingNFT.sol';
 import {Treasure} from 'contracts/staking/Treasure.sol';
 

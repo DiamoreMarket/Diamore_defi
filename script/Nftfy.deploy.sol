@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import 'forge-std/src/Script.sol';
-import 'contracts/nft/NFTify721.sol';
+import 'contracts/mock/nft/NFTify721.sol';
 
 contract NftfyDeploy is Script {
     function run() external {

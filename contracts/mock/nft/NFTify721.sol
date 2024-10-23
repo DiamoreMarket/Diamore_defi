@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "contracts/nft/lib/@openzeppelin/contracts/security/Pausable.sol";
-import "contracts/nft/lib/@openzeppelin/contracts/access/Ownable.sol";
-import "contracts/nft/lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import './lib/@openzeppelin/contracts/security/Pausable.sol';
+import './lib/@openzeppelin/contracts/access/Ownable.sol';
+import './lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 
-import "./ERC721Permit.sol";
+import './ERC721Permit.sol';
 
 contract NFTify721 is Ownable, Pausable, ERC721Permit, ERC721Enumerable {
     string public baseURI;
@@ -34,7 +34,7 @@ contract NFTify721 is Ownable, Pausable, ERC721Permit, ERC721Enumerable {
     function isAdmin(address _admin) public view returns (bool) {
         return adminList[_admin];
     }
-    
+
     function setAdminList(address _admin, bool _status) external onlyOwner {
         adminList[_admin] = _status;
     }
@@ -66,11 +66,11 @@ contract NFTify721 is Ownable, Pausable, ERC721Permit, ERC721Enumerable {
         uint256 batchSize
     ) internal virtual override(ERC721, ERC721Enumerable) {
         if (from != address(0)) {
-            require(tokenIdTransferAllowed[tokenId], "ERC721: transfer of locked token id");
+            require(tokenIdTransferAllowed[tokenId], 'ERC721: transfer of locked token id');
         }
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
 
-        require(!paused(), "NFTify721: token transfer while paused");
+        require(!paused(), 'NFTify721: token transfer while paused');
     }
 
     /**
@@ -99,11 +99,7 @@ contract NFTify721 is Ownable, Pausable, ERC721Permit, ERC721Enumerable {
      * - caller must be owner or controller
      *
      */
-    function mint(
-        address account,
-        uint256 id,
-        bytes memory data
-    ) public {
+    function mint(address account, uint256 id, bytes memory data) public {
         // require(
         //     _msgSender() == controller || _msgSender() == owner(),
         //     "NFTify721: only owner or controller"
@@ -119,10 +115,7 @@ contract NFTify721 is Ownable, Pausable, ERC721Permit, ERC721Enumerable {
      *
      */
     function burn(uint256 id) public virtual {
-        require(
-            _isApprovedOrOwner(_msgSender(), id),
-            "NFTify721: caller is not owner nor approved"
-        );
+        require(_isApprovedOrOwner(_msgSender(), id), 'NFTify721: caller is not owner nor approved');
         _burn(id);
     }
 
@@ -143,15 +136,9 @@ contract NFTify721 is Ownable, Pausable, ERC721Permit, ERC721Enumerable {
     /**
      * @dev See {ERC721Permit-supportsInterface, ERC721Enumerable-supportsInterface}
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721Enumerable, ERC721Permit)
-        returns (bool)
-    {
-        return
-            ERC721Enumerable.supportsInterface(interfaceId) ||
-            ERC721Permit.supportsInterface(interfaceId);
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC721Enumerable, ERC721Permit) returns (bool) {
+        return ERC721Enumerable.supportsInterface(interfaceId) || ERC721Permit.supportsInterface(interfaceId);
     }
 }

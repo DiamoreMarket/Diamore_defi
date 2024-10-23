@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "contracts/nft/lib/@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "contracts/nft/lib/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import "contracts/nft/lib/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "./lib/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./lib/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import "./lib/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "./IERC721Permit.sol";
 

@@ -23,8 +23,6 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
     mapping(uint256 => NFTInfo) internal _nftInfoById;
     mapping(bytes32 => bool) internal _isHashUsed;
 
-    // mapping(address => uint256[]) internal tokensByOwner;
-
     event TreasureUpdated(address newTreasure);
 
     constructor(address collectionNFT, address validator, address rewardToken) EIP712('StakingNFT', '1.0') {
@@ -42,7 +40,6 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
         IERC721(collection).safeTransferFrom(msg.sender, treasure, tokenId);
         uint256 timeUnlock = _choiceLockPeriod(lock);
         _nftInfoById[tokenId] = NFTInfo({owner: msg.sender, timeUnlock: timeUnlock});
-        // tokensByOwner[msg.sender].push(tokenId);
 
         emit Staked(msg.sender, tokenId, timeUnlock, lock);
     }
@@ -51,37 +48,17 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
         if (msg.sender != _nftInfoById[tokenId].owner) {
             revert NotOwner();
         }
-        // Todo: uncomment
-        // if (_nftInfoById[tokenId].timeUnlock > block.timestamp) {
-        //     revert NotReadyToUnstake(_nftInfoById[tokenId].timeUnlock);
-        // }
+        if (_nftInfoById[tokenId].timeUnlock > block.timestamp) {
+            revert NotReadyToUnstake(_nftInfoById[tokenId].timeUnlock);
+        }
 
         IERC721(collection).safeTransferFrom(treasure, msg.sender, tokenId);
         delete (_nftInfoById[tokenId]);
 
-
         emit Unstaked(msg.sender, tokenId);
     }
 
-    function getInfoNFT(uint256 tokenId) external view override returns (NFTInfo memory) {
-        return _nftInfoById[tokenId];
-    }
-
-    function recoverSign(
-        Vrs calldata vrs,
-        Message calldata message
-    ) external view override returns (address _recoverAddress) {
-        (_recoverAddress, ) = _recoverMsg(vrs, message);
-
-        return _recoverAddress;
-    }
-
-    function getVrsStatus(Message calldata message) external view override returns (bool) {
-        bytes32 digest = hashTypedDataV4(message);
-        return _isHashUsed[digest];
-    }
-
-    function claim(Vrs calldata vrs, Message calldata message) public override {
+    function claim(Vrs calldata vrs, Message calldata message) external override {
         (address _recoverAddress, bytes32 digest) = _recoverMsg(vrs, message);
         if (_isHashUsed[digest]) {
             revert HashUsed();
@@ -100,6 +77,24 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
         IERC20(tokenReward).safeTransferFrom(treasure, message.account, message.amount);
 
         emit Claimed(msg.sender, message.amount, vrs);
+    }
+
+    function getInfoNFT(uint256 tokenId) external view override returns (NFTInfo memory) {
+        return _nftInfoById[tokenId];
+    }
+
+    function recoverSign(
+        Vrs calldata vrs,
+        Message calldata message
+    ) external view override returns (address _recoverAddress) {
+        (_recoverAddress, ) = _recoverMsg(vrs, message);
+
+        return _recoverAddress;
+    }
+
+    function getVrsStatus(Message calldata message) external view override returns (bool) {
+        bytes32 digest = hashTypedDataV4(message);
+        return _isHashUsed[digest];
     }
 
     function hashTypedDataV4(Message calldata message) public view override returns (bytes32 digest) {

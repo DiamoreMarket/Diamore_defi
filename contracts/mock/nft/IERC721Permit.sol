@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "contracts/nft/lib/@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "contracts/nft/lib/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import "contracts/nft/lib/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import './lib/@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import './lib/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol';
+import './lib/@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 interface IERC721Permit {
     function DOMAIN_SEPARATOR() external view returns (bytes32);
@@ -25,12 +25,5 @@ interface IERC721Permit {
      * @param r R component
      * @param s S component
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function permit(address owner, address spender, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external;
 }
