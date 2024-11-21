@@ -6,12 +6,14 @@ interface IStakingNFT {
         address owner;
         uint256 timeUnlock;
     }
+
     struct Message {
         address account;
         uint256 amount;
         uint256 nonce;
         uint256 timeExpire;
     }
+
     struct Vrs {
         uint8 v;
         bytes32 r;
