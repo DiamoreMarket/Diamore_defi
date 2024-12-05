@@ -1,18 +1,18 @@
-import {Test, console, Vm} from 'forge-std/src/Test.sol';
-import {VmSafe} from 'node_modules/forge-std/src/Vm.sol';
-import {IERC20, SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import {NFTify721} from 'contracts/mock/nft/NFTify721.sol';
-import {StakingNFT, IStakingNFT} from 'contracts/staking/StakingNFT.sol';
-import {Treasure} from 'contracts/staking/Treasure.sol';
+import {Test, console, Vm} from "forge-std/src/Test.sol";
+import {VmSafe} from "node_modules/forge-std/src/Vm.sol";
+import {IERC20, SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {NFTify721} from "contracts/mock/nft/NFTify721.sol";
+import {StakingNFT, IStakingNFT} from "contracts/staking/StakingNFT.sol";
+import {Treasure} from "contracts/staking/Treasure.sol";
 
 contract StakingNFTTest is Test {
     using SafeERC20 for IERC20;
 
-    address adminTreasure = makeAddr('adminTreasure');
-    address admin = makeAddr('admin');
-    address deployer = makeAddr('deployer');
-    VmSafe.Wallet validator = vm.createWallet('validator');
-    VmSafe.Wallet badValidator = vm.createWallet('badValidator');
+    address adminTreasure = makeAddr("adminTreasure");
+    address admin = makeAddr("admin");
+    address deployer = makeAddr("deployer");
+    VmSafe.Wallet validator = vm.createWallet("validator");
+    VmSafe.Wallet badValidator = vm.createWallet("badValidator");
 
     address holder = 0x693a10f33974FdA182e34d0d179c5247874897A3;
     address controller = 0x25f2F80D9a45B641bEf25342A1B2a0Ae48F78539;
@@ -23,7 +23,7 @@ contract StakingNFTTest is Test {
     Treasure treasureContract;
 
     function setUp() public {
-        uint256 forkId = vm.createFork(vm.envString('ALCHEMY_RPC'), 20008600);
+        uint256 forkId = vm.createFork(vm.envString("ALCHEMY_RPC"), 20008600);
         vm.selectFork(forkId);
 
         vm.startPrank(deployer);
@@ -53,7 +53,7 @@ contract StakingNFTTest is Test {
         vm.stopPrank();
 
         vm.startPrank(holder);
-        vm.expectRevert(bytes('ERC721: caller is not token owner or approved'));
+        vm.expectRevert(bytes("ERC721: caller is not token owner or approved"));
         staking.stake(tokenId, IStakingNFT.LockPeriod.ThreeMonths);
         _stake(tokenId);
 
@@ -66,12 +66,8 @@ contract StakingNFTTest is Test {
     }
 
     function test_sign() public {
-        IStakingNFT.Message memory message = IStakingNFT.Message({
-            account: holder,
-            amount: 100,
-            nonce: 0,
-            timeExpire: block.timestamp + 1000
-        });
+        IStakingNFT.Message memory message =
+            IStakingNFT.Message({account: holder, amount: 100, nonce: 0, timeExpire: block.timestamp + 1000});
 
         IStakingNFT.Vrs memory vrs = _sign(message, validator);
         address _recoverAddress = staking.recoverSign(vrs, message);
@@ -89,12 +85,8 @@ contract StakingNFTTest is Test {
         _allowTransfer(tokenId);
         _stake(tokenId);
 
-        IStakingNFT.Message memory message = IStakingNFT.Message({
-            account: holder,
-            amount: 100e6,
-            nonce: 0,
-            timeExpire: block.timestamp + 1000
-        });
+        IStakingNFT.Message memory message =
+            IStakingNFT.Message({account: holder, amount: 100e6, nonce: 0, timeExpire: block.timestamp + 1000});
         IStakingNFT.Vrs memory vrs = _sign(message, badValidator);
 
         vm.expectRevert(abi.encodeWithSelector(IStakingNFT.InvalidSignature.selector));
@@ -135,9 +127,8 @@ contract StakingNFTTest is Test {
         vm.startPrank(holder);
         IStakingNFT.NFTInfo memory info = staking.getInfoNFT(tokenId);
 
-        // Todo: uncomment
-        // vm.expectRevert(abi.encodeWithSelector(IStakingNFT.NotReadyToUnstake.selector, info.timeUnlock));
-        // staking.unstake(tokenId);
+        vm.expectRevert(abi.encodeWithSelector(IStakingNFT.NotReadyToUnstake.selector, info.timeUnlock));
+        staking.unstake(tokenId);
         vm.warp(block.timestamp + 100 days);
         _unstake(tokenId);
         assertEq(IERC20(usdt).balanceOf(holder), 0);
@@ -179,10 +170,10 @@ contract StakingNFTTest is Test {
         vm.stopPrank();
     }
 
-    function _sign(
-        IStakingNFT.Message memory message,
-        VmSafe.Wallet memory signer
-    ) internal returns (IStakingNFT.Vrs memory vrs) {
+    function _sign(IStakingNFT.Message memory message, VmSafe.Wallet memory signer)
+        internal
+        returns (IStakingNFT.Vrs memory vrs)
+    {
         bytes32 digest = staking.hashTypedDataV4(message);
         (vrs.v, vrs.r, vrs.s) = vm.sign(signer, digest);
     }

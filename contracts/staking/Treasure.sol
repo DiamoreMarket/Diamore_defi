@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
+
 import {IERC20, SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
@@ -50,7 +51,7 @@ contract Treasure is AccessControl, ERC721Holder, ITreasure {
         emit WithdrawNft(msg.sender, to, tokenId);
     }
 
-    function balanceOf(address token) external override view returns (uint256) {
+    function balanceOf(address token) external view override returns (uint256) {
         return IERC20(token).balanceOf(address(this));
     }
 

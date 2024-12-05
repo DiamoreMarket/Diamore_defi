@@ -1,23 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import 'forge-std/src/Script.sol';
-import '../contracts/staking/StakingNFT.sol';
+import "forge-std/src/Script.sol";
+import "../contracts/staking/StakingNFT.sol";
 
 contract StakingNFTDeploy is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        address collection = 0xd5ce3bCd228F9f098898DDcc9cbcc57657cdB2Dc;
-        address validator = 0xf514358dE9C397D164196403d59C78E7402aec0F;
-        address token = 0x20516d48337377268b4e6b885b5d6cb39eee65c9;
+        address collection = 0x20B7287A72c68602a6b9E3b7F0D8AC0E1b02d2b4;
+        address validator = 0xF859e9f0dC674D5A02616006CE9bdFDEDD1A8876;
+        address token = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
         StakingNFT staking = new StakingNFT(collection, validator, token);
-        console.log('StakingNFT address: ', address(staking));
+        console.log("StakingNFT address: ", address(staking));
         vm.stopBroadcast();
     }
 }
-
-// command terminal
-// source .env
-// forge script --chain sepolia script/Staking.deploy.sol:StakingNFTDeploy --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv

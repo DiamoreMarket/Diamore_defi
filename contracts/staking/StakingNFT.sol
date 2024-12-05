@@ -29,6 +29,7 @@ contract StakingNFT is EIP712, AccessControl, IStakingNFT {
         collection = collectionNFT;
         tokenReward = rewardToken;
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
         _grantRole(VALIDATOR_ROLE, validator);
     }
 
